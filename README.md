@@ -25,6 +25,7 @@ These components are:-
  - Authentication Server
  - Services Server (to create Docker containers)
  - Docker Interface Library
+ - CLI (Command Line Tools)
 
 ### /client
 This folder contains client-side tools & libraries such as:- 
