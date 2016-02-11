@@ -1,4 +1,6 @@
-# Final Year Project
+Final Year Project
+=======
+
 This project will investigate current technologies for deploying a Cloud Computing System, which will be capable of hosting linux containers. Technology such as Maas, Juju, OpenStack & Docker will be explored with the intention of monitoring it’s performance.
 
 ## Background
@@ -35,3 +37,11 @@ This folder contains client-side tools & libraries such as:-
 ### /shared
 This folder contains shared libraries used for client and server such as:-
  - Authentication Library
+
+## Installation
+```
+git clone git@github.com:muhammaddadu/finalYearProeject.git
+mv finalYearProeject /fyp
+cd /fyp/server/scripts
+sudo ./install
+``` 
