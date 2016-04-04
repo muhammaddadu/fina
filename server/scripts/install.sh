@@ -3,11 +3,11 @@
 # Installation script for Ubuntu 12.04 LTS
 # @author Muhammad Dadu
 
-export PORJECT_NAME="Final Year Project"
-export DEFAULT_HOSTNAME="fyp"
-export DEFAULT_PASSWORD="fyp2016"
+export PORJECT_NAME="Clout - Cloud Technology"
+export DEFAULT_HOSTNAME="clout"
+export DEFAULT_PASSWORD="clout2016"
 export isVagrantVMFile="/etc/is_vagrant_vm"
-export SERVICES_PATH='/fyp/server/node_modules/'
+export SERVICES_PATH='/clout/server/node_modules/'
 
 echo "------------------------------------------------"
 echo "------------------------------------------------"
@@ -18,17 +18,17 @@ echo ""
 echo "Checking server state..."
 
 # load functions
-source /fyp/server/scripts/functions.sh
+source /clout/server/scripts/functions.sh
 
 echo "NodeJS:  	$(echo_if $(is_installed node))"
 echo "Docker:  	$(echo_if $(is_installed docker))"
-echo "Redis:   	$(echo_if $(is_installed redis-server))"
-echo "MySQL:   	$(echo_if $(is_installed mysql))"
-echo "Nginx:  	$(echo_if $(is_installed nginx))"
-echo "Nodemon:	$(echo_if $(is_installed nodemon))"
+# echo "Redis:   	$(echo_if $(is_installed redis-server))"
+# echo "MySQL:   	$(echo_if $(is_installed mysql))"
+# echo "Nginx:  	$(echo_if $(is_installed nginx))"
+echo "initd-forever:	$(echo_if $(is_installed initd-forever))"
 echo ""
 
-if [ -e "/etc/hasFyp" ];
+if [ -e "/etc/hasclout" ];
 then
     echo $PORJECT_NAME "provisioning already completed. Skipping..."
     exit 0
@@ -106,96 +106,77 @@ else
 fi
 
 ##
-# Redis Server
+# sqlite3 Installation
 ##
-if [ $(is_installed redis-server) == 1 ];
-then
-	echo "Skipping Redis installation"
-else
-	echo "Installing Redis..."
-	add-apt-repository -y ppa:chris-lea/redis-server > /dev/null
-	apt-get update > /dev/null
-	apt-get install -y redis-server > /dev/null
-	echo "Installed!"
-fi
+# TODO
 
-##
-# MySQL Server
-##
-if [ $(is_installed mysql) == 1 ];
-then
-	echo "Skipping MySQL installation"
-else
-	echo "Installing MySQL..."
-	# Install unattended
-	sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password '$DEFAULT_PASSWORD''
-	sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password '$DEFAULT_PASSWORD''
-	apt-get install -y mysql-server > /dev/null
-	echo "Installed!"
-fi
-
-##
-# Nginx
-##
-if [ $(is_installed nginx) == 1 ];
-then
-	echo "Skipping Nginx installation"
-else
-	echo "Installing Nginx..."
-	# Install unattended
-	apt-get install -y nginx > /dev/null
-	echo "Installed!"
-fi
-service nginx restart > /dev/null # restart nginx
-
-##
-# Nodemon
-##
-if [ $(is_installed nodemon) == 1 ];
-then
-	echo "Skipping Nodemon installation"
-else
-	echo "Installing Nodemon..."
-	npm install nodemon -g > /dev/null
-	echo "Installed!"
-fi
-
-# symlink services manager
-# if [ $(is_installed servicesManager) == 1 ];
+# ##
+# # Redis Server
+# ##
+# if [ $(is_installed redis-server) == 1 ];
 # then
-# 	echo "Skipping Service Manager installation"
+# 	echo "Skipping Redis installation"
 # else
-# 	echo "Installing Service Manager..."
-# 	cd $SERVICES_PATH
-# 	cd service-manager
-# 	npm install > /dev/null
-# 	npm link > /dev/null
+# 	echo "Installing Redis..."
+# 	add-apt-repository -y ppa:chris-lea/redis-server > /dev/null
+# 	apt-get update > /dev/null
+# 	apt-get install -y redis-server > /dev/null
 # 	echo "Installed!"
 # fi
-# setup auth server
-# servicesManager load --dir $SERVICES_PATH/clout-auth-server --local
-# setup services server
-# servicesManager load --dir $SERVICES_PATH/services-server --local
+
+# ##
+# # MySQL Server
+# ##
+# if [ $(is_installed mysql) == 1 ];
+# then
+# 	echo "Skipping MySQL installation"
+# else
+# 	echo "Installing MySQL..."
+# 	# Install unattended
+# 	sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password '$DEFAULT_PASSWORD''
+# 	sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password '$DEFAULT_PASSWORD''
+# 	apt-get install -y mysql-server > /dev/null
+# 	echo "Installed!"
+# fi
+
+# ##
+# # Nginx
+# ##
+# if [ $(is_installed nginx) == 1 ];
+# then
+# 	echo "Skipping Nginx installation"
+# else
+# 	echo "Installing Nginx..."
+# 	# Install unattended
+# 	apt-get install -y nginx > /dev/null
+# 	echo "Installed!"
+# fi
+# service nginx restart > /dev/null # restart nginx
 
 ##
-# FYP services
+# initd-forever
 ##
-# SERVICES_PATH='/fyp/server/node_modules/'
-# # auth server
-# SERVICE_NAME='clout-auth-server'
-# # Link Service
-# echo "$SERVICE_NAME: Link Service"
-# FILE=$SERVICES_PATH""$SERVICE_NAME"/server-pack/"$SERVICE_NAME
-# if [ -e "/etc/init.d/"$SERVICE_NAME"" ]; then
-# 	rm -rf /etc/init.d/$SERVICE_NAME
-# fi
-# chmod +x $FILE;
-# ln -s $FILE /etc/init.d/$SERVICE_NAME
-# # add to startup
-# update-rc.d $SERVICE_NAME defaults;
-# # Start Service
-# echo "$SERVICE_NAME: Start Service"
-# exec service $SERVICE_NAME start;
+if [ $(is_installed initd-forever) == 1 ];
+then
+	echo "Skipping initd-forever installation"
+else
+	echo "Installing initd-forever..."
+	npm install -g initd-forever forever > /dev/null
+	echo "Installed!"
+fi
+
+##
+# clout services
+##
+SERVICES_PATH='/clout/server/node_modules/'
+# auth server
+SERVICE_NAME='clout-services-child'
+# Link Service
+echo "$SERVICE_NAME: Link Service"
+initd-forever --app $SERVICES_PATH""$SERVICE_NAME --name $SERVICE_NAME --env development
+chmod +x $SERVICE_NAME
+mv $SERVICE_NAME /etc/init.d/$SERVICE_NAME
+service $SERVICE_NAME start
 
 echo ""
 echo "------------------------------------------------"
