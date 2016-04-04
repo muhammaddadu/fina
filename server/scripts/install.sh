@@ -70,7 +70,7 @@ echo "------------------------------------------------"
 echo "Updating/Installing Core Componenets..."
 apt-get update > /dev/null
 # Install build tools
-apt-get install -y make g++ git curl vim libcairo2-dev libav-tools nfs-common portmap > /dev/null
+apt-get install -y make g++ git curl vim libcairo2-dev libav-tools nfs-common portmap software-properties-common > /dev/null
 echo "Updated/Installed!"
 
 ##
